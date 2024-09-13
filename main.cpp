@@ -125,7 +125,7 @@ int Create_F(const char* file_name_, int& size, Employee* arr) //size - נואכüםאÿ
 	char date[11];
 	size = 0;
 
-	while (fscanf(file, "%s %s %d %f %s", surname, initials, &year, &salary, date))
+	while (fscanf(file, "%s %s %d %f %s", surname, initials, &year, &salary, date) != EOF)
 	{
 		strcat(surname, " ");
 		strcat(surname, initials);
@@ -139,6 +139,8 @@ int Create_F(const char* file_name_, int& size, Employee* arr) //size - נואכüםאÿ
 
 	if (size > maxn)
 		return -2;
+
+	return 0;
 }
 
 float Request_1(Employee* arr_, int size_, int current_year_, int& k, char** FIO_25years)
@@ -179,13 +181,12 @@ int main()
 	int error = 0;
 
 	error = Create_F("test.txt", size, arr);
-	if (error == -1)
+	switch (error)
 	{
+	case -1:
 		printf("File opening error");
 		exit(-1);
-	}
-	else
-	{
+	case -2:
 		printf("There is too much incoming data");
 		exit(-2);
 	}
