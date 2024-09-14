@@ -197,7 +197,7 @@ int main()
 	for (int i = 0; i < maxn; i++)
 		FIO_25years[i] = new char[31];
 
-	printf("Average salary: %f\n", Request_1(arr, size, 2024, size_employee, FIO_25years));
+	printf("Average salary: %0.2f\n", Request_1(arr, size, 2024, size_employee, FIO_25years));
 
 	for (int i = 0; i < size_employee; i++)
 	{
