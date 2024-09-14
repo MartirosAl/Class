@@ -78,7 +78,7 @@ public:
 		return year;
 	}
 
-	int Get_Salary()
+	float Get_Salary()
 	{
 		return salary;
 	}
