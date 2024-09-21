@@ -8,15 +8,14 @@ const int maxn = 100;
 
 class Employee
 {
-private://[private:] - êâàäðàòíûå ñêîáêè îçíà÷àþò âîçìîæíîñòü óïóùåíèÿ
-	//<Îïèñàíèå ñêðûòûõ ýëåìåíòîâ>
-		char* name;
-		int year;
-		float salary;
-		char date[11];
+private:
+	char* name;
+	int year;
+	float salary;
+	char date[11];
 
 public:
-	//<Îïèñàíèå îòêðûòûõ ýëåìåíòîâ>
+	
 	Employee()
 	{
 		name = new char[20];
@@ -37,9 +36,8 @@ public:
 			delete[] name;
 
 	}
-	// Ìåòîäû
 
-	void Set_Name(char* name_) // Óñòàíîâëåíèå èìåíè
+	void Set_Name(const char* name_)
 	{
 		strcpy(name, name_);
 	}
@@ -54,12 +52,12 @@ public:
 		salary = salary_;
 	}
 
-	void Set_Date(char* date_)
+	void Set_Date(const char* date_)
 	{
 		strcpy(date, date_);
 	}
 
-	char* Get_Name() //Âûâîä èìåíè
+	char* Get_Name()
 	{
 		return name;
 	}
@@ -79,17 +77,18 @@ public:
 		return date;
 	}
 
-	void Print_Info() //Print âñåãî
+	void Print_Info() 
 	{
-		printf("%s %d %f %s", name, year, salary, date);
+		printf("%s %d %0.2f %s", name, year, salary, date);
 	}
 
-	void Input_Info() //Ââîä âñåãî
+	void Input_Info() 
 	{
 		char initials[5];
 
 		scanf_s("%s %s %d %f %s", name, initials, &year, &salary, date);
 
+		
 		strcat(name, " ");
 		strcat(name, initials);
 	}
@@ -102,7 +101,146 @@ public:
 
 };
 
-int Create_F(const char* file_name_, int& size, Employee* arr) //size - ðåàëüíàÿ ðàçìåðíîñòè ìàññèâà
+class Base
+{
+private:
+	Employee* arr;
+	int size;
+
+public:
+	
+	Base()
+	{
+		arr = new Employee[maxn];
+		size = 0;
+	}
+
+	Base(int size_)
+	{
+		arr = new Employee[size_];
+		size = size_;
+	}
+
+	~Base()
+	{
+		delete[] arr;
+	}
+
+	Employee Get_Employee(int i_)
+	{
+		return arr[i_];
+	}
+	void Set_Size(int size_)
+	{
+		size = size_;
+	}
+
+	int Get_Size()
+	{
+		return size;
+	}
+
+	int Create_Base_F(const char* file_name_)
+	{
+		FILE* file;
+		fopen_s(&file, file_name_, "r");
+		if (!file)
+			return -1;
+
+
+		char surname[31];
+		char initials[5];
+		int year = 0;
+		float salary = 0.0;
+		char date[11];
+		size = 0;
+
+		while (fscanf(file, "%s %s %d %f %s", surname, initials, &year, &salary, date) != EOF)
+		{
+			strcat(surname, " ");
+			strcat(surname, initials);
+			arr[size].Set_Name(surname);
+			arr[size].Set_Year(year);
+			arr[size].Set_Salary(salary);
+			arr[size].Set_Date(date);
+
+			size++;
+		}
+
+		if (size > maxn)
+			return -2;
+
+		return 0;
+	}
+
+	void Print_Base()
+	{
+		for (int i = 0; i < size; i++)
+		{
+			arr[i].Print_Info();
+			printf("\n");
+		}
+	}
+
+	int Add_from_class(Employee employee_)
+	{
+		arr[size].Set_Name(employee_.Get_Name());
+		arr[size].Set_Date(employee_.Get_Date());
+		arr[size].Set_Salary(employee_.Get_Salary());
+		arr[size].Set_Year(employee_.Get_Year());
+		size++;
+
+		return 0;
+	}
+
+	int Add_from_class(Employee* employee_, int& size_)
+	{
+		for (int i = 0; i < size_; i++)
+		{
+			arr[size].Set_Name(employee_[i].Get_Name());
+			arr[size].Set_Date(employee_[i].Get_Date());
+			arr[size].Set_Salary(employee_[i].Get_Salary());
+			arr[size].Set_Year(employee_[i].Get_Year());
+			size++;
+		}
+
+		return 0;
+	}
+
+	//int Add_from_base(Base base_)
+	//{
+	//	int size_base_ = base_.Get_Size();
+	//	for (int i = 0; i < size_base_; i++)
+	//	{
+	//		arr[size].Set_Name((base_.Get_Employee(i)).Get_Name());
+	//		arr[size].Set_Date((base_.Get_Employee(i)).Get_Date());
+	//		arr[size].Set_Salary((base_.Get_Employee(i)).Get_Salary());
+	//		arr[size].Set_Year((base_.Get_Employee(i)).Get_Year());
+	//	}
+
+	//	return 0;
+	//}
+
+	int Add(const char* name_, int year_, float salary_, const char date_[11])
+	{
+		Employee employee;
+		arr[size].Set_Date(date_);
+		arr[size].Set_Name(name_);
+		arr[size].Set_Salary(salary_);
+		arr[size].Set_Year(year_);
+
+		size++;
+
+		return 0;
+	}
+	
+	void delete_note(const char* name_)
+	{
+		
+	}
+};
+
+int Create_F(const char* file_name_, int& size, Employee* arr) 
 {
 	FILE* file;
 	fopen_s(&file, file_name_, "r");
@@ -165,6 +303,7 @@ float Request_1(Employee* arr_, int size_, int current_year_, int& k, char** FIO
 
 int main()
 {
+	/*
 	int size;
 
 	Employee arr[maxn];
@@ -194,7 +333,40 @@ int main()
 	{
 		printf("%s\n", FIO_25years[i]);
 	}
+	*/
+
+	Base base;
+
+	base.Create_Base_F("test.txt");
+
+	base.Print_Base();
+	printf("----\n");
+
+	base.Add("Maaaa A.E.", 2000, 1111.1, "01.02.3008");
+
+	base.Print_Base();
+	printf("----\n");
+
+	Employee emp[maxn];
+	int size;
+
+	Create_F("test2.txt", size, emp);
+
+	base.Add_from_class(emp, size);
+
+	base.Print_Base();
+	printf("----\n");
+
+	//Base base2;
+
+	//base2.Create_Base_F("test2.txt");
+
+	//base.Add_from_base(base2);
+
+	//base.Print_Base();
+	//printf("----\n");
 
 
 
 	return 0;
+}
