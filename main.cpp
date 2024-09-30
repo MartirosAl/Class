@@ -4,24 +4,27 @@
 #include <stdlib.h>
 using namespace std;
 
+
 const int maxn = 100;
+
 
 class Employee
 {
 private:
 	char* name;
-	int year;
+	int year; //year of birth
 	float salary;
-	char date[11];
+	char date[11]; //date of receipt
 
 public:
 	
 	Employee()
 	{
-		name = new char[20];
+		name = new char[31];
 		year = 0;
 		salary = 0.0;
 		date[0] = '\0';
+		//printf("Default constructor employee working\n");
 	}
 	Employee(int n)
 	{
@@ -29,12 +32,34 @@ public:
 		year = 0;
 		salary = 0.0;
 		date[0] = '\0';
+		//printf("Constructor employee working\n");
 	}
 	~Employee()
 	{
-		if (name)
-			delete[] name;
+		delete[] name;
+		//printf("Destructor employee working\n");
+	}
 
+	Employee(const Employee& employee_)
+	{
+		name = new char[strlen(employee_.name)+1];
+		strcpy(name, employee_.name);
+		year = employee_.year;
+		salary = employee_.salary;
+		strcpy(date, employee_.date);
+	}
+
+	Employee operator = (Employee& employee_)
+	{
+		if (&employee_ == this) return *this;
+		delete[] name;
+		name = new char[strlen(employee_.name) + 1];
+		strcpy(name, employee_.name);
+		year = employee_.year;
+		salary = employee_.salary;
+		strcpy(date, employee_.date);
+
+		return *this;
 	}
 
 	void Set_Name(const char* name_)
@@ -42,12 +67,12 @@ public:
 		strcpy(name, name_);
 	}
 
-	void Set_Year(int year_)
+	void Set_Year(const int year_)
 	{
 		year = year_;
 	}
 
-	void Set_Salary(float salary_)
+	void Set_Salary(const float salary_)
 	{
 		salary = salary_;
 	}
@@ -79,21 +104,25 @@ public:
 
 	void Print_Info() 
 	{
-		printf("%s %d %0.2f %s", name, year, salary, date);
+		printf("%-20s  \t| %d\t| %0.2f\t| %s\t|", name, year, salary, date);
 	}
 
-	void Input_Info() 
+	int Input_Info() 
 	{
 		char initials[5];
 
-		scanf_s("%s %s %d %f %s", name, initials, &year, &salary, date);
+		if (!scanf("%s %s %d %f %s", name, initials, &year, &salary, date))
+			return 4;
 
 		
 		strcat(name, " ");
+		if (initials[4] != '\0')
+			return 3;
 		strcat(name, initials);
+		return 0;
 	}
 
-	bool Sif(char* str_)
+	bool Sif(const char* str_)
 	{
 		return (strcmp(name, str_) == 0) ? true : false;
 	}
@@ -106,33 +135,65 @@ class Base
 private:
 	Employee* arr;
 	int size;
+	int max_size;
 
 public:
 	
 	Base()
 	{
-		arr = new Employee[maxn];
+		max_size = 100;
+		arr = new Employee[max_size];
 		size = 0;
+		//printf("Default constructor base working\n");
 	}
 
 	Base(int size_)
 	{
-		arr = new Employee[size_];
-		size = size_;
+		int i = 1;
+		for (; 100 * i < size_; ++i);
+		max_size = 100 * i;
+		arr = new Employee[max_size];
+		size = 0;
+		//printf("Constructor base working\n");
 	}
 
 	~Base()
 	{
 		delete[] arr;
+		//printf("Destructor base working\n");
+	}
+
+	Base(const Base& base_)
+	{
+		arr = new Employee[base_.max_size];
+		size = base_.size;
+		max_size = base_.max_size;
+		for (int i = 0; i < size; ++i)
+		{
+			arr[i] =	base_.arr[i];
+		}
+		
 	}
 
 	Employee Get_Employee(int i_)
 	{
 		return arr[i_];
 	}
+	
+
+	void Set_Arr(Employee** arr_)
+	{
+		arr = *arr_;
+	}
+
 	void Set_Size(int size_)
 	{
 		size = size_;
+	}
+
+	Employee* Get_Arr()
+	{
+		return arr;
 	}
 
 	int Get_Size()
@@ -140,12 +201,18 @@ public:
 		return size;
 	}
 
+	int Get_Max_Size()
+	{
+		return max_size;
+	}
+
+
 	int Create_Base_F(const char* file_name_)
 	{
 		FILE* file;
 		fopen_s(&file, file_name_, "r");
 		if (!file)
-			return -1;
+			return 1;
 
 
 		char surname[31];
@@ -158,6 +225,8 @@ public:
 		while (fscanf(file, "%s %s %d %f %s", surname, initials, &year, &salary, date) != EOF)
 		{
 			strcat(surname, " ");
+			if (initials[4] != '\0')
+				return 3;
 			strcat(surname, initials);
 			arr[size].Set_Name(surname);
 			arr[size].Set_Year(year);
@@ -165,21 +234,24 @@ public:
 			arr[size].Set_Date(date);
 
 			size++;
+			if (size > max_size-1)
+				return 2;
 		}
-
-		if (size > maxn)
-			return -2;
-
 		return 0;
 	}
 
-	void Print_Base()
+	int Print_Base()
 	{
-		for (int i = 0; i < size; i++)
+		printf("\tNAME\t\t\t| YEAR\t|   SALARY\t|     DATE\t|  \n");
+		printf("--------------------------------|-------|---------------|---------------|\n");
+		for (int i = 0; i < size; ++i)
 		{
+			printf("  %d. ", i+1);
 			arr[i].Print_Info();
 			printf("\n");
 		}
+		printf("--------------------------------^-------^---------------^---------------/\n");
+		return 0;
 	}
 
 	int Add_from_class(Employee employee_)
@@ -190,62 +262,159 @@ public:
 		arr[size].Set_Year(employee_.Get_Year());
 		size++;
 
+		if (size > max_size - 1)
+			return 2;
+
 		return 0;
 	}
 
-	int Add_from_class(Employee* employee_, int& size_)
+	int Add_from_classes(Employee* employee_, int& size_)
 	{
-		for (int i = 0; i < size_; i++)
+		for (int i = 0; i < size_; ++i)
 		{
 			arr[size].Set_Name(employee_[i].Get_Name());
 			arr[size].Set_Date(employee_[i].Get_Date());
 			arr[size].Set_Salary(employee_[i].Get_Salary());
 			arr[size].Set_Year(employee_[i].Get_Year());
 			size++;
+
+			if (size > max_size - 1)
+				return 2;
 		}
 
 		return 0;
 	}
 
-	//int Add_from_base(Base base_)
-	//{
-	//	int size_base_ = base_.Get_Size();
-	//	for (int i = 0; i < size_base_; i++)
-	//	{
-	//		arr[size].Set_Name((base_.Get_Employee(i)).Get_Name());
-	//		arr[size].Set_Date((base_.Get_Employee(i)).Get_Date());
-	//		arr[size].Set_Salary((base_.Get_Employee(i)).Get_Salary());
-	//		arr[size].Set_Year((base_.Get_Employee(i)).Get_Year());
-	//	}
-
-	//	return 0;
-	//}
-
-	int Add(const char* name_, int year_, float salary_, const char date_[11])
+	int Add(const char* name_, int year_, float salary_, const char* date_)
 	{
-		Employee employee;
-		arr[size].Set_Date(date_);
 		arr[size].Set_Name(name_);
+		arr[size].Set_Date(date_);
 		arr[size].Set_Salary(salary_);
 		arr[size].Set_Year(year_);
-
+		
 		size++;
+
+		if (size > max_size - 1)
+			return 2;
 
 		return 0;
 	}
 	
-	void delete_note(const char* name_)
+	int Delete_Note(const char* name_)
 	{
-		
+		int index = Find_Data_on_Name(name_);
+		if (index < 0)
+			return 0;
+
+		for (; index < size; ++index)
+			arr[index] = arr[index + 1];
+
+		--size;
+		return 0;
+	}
+
+	int Find_Data_on_Name(const char* name_)
+	{
+		for (int i = 0; i < size; ++i)
+		{
+			if (arr[i].Sif(name_))
+				return i;
+		}
+		return -1;
+	}
+
+	int Edit_Data(const int choice_)
+	{
+		Print_Base();
+		printf("Select the number to change: ");
+		int index;
+		if (!scanf("%d", &index))
+			return 4;
+		printf("\n");
+		switch (choice_)
+		{
+		case(1):
+			char new_name[31];
+			char new_initials[5];
+			printf("Enter a new name: ");
+			if (!scanf("%s %s", new_name, new_initials))
+				return 4;
+			if (new_initials[4] != '\0')
+				return 3;
+			strcat(new_name, " ");
+			strcat(new_name, new_initials);
+			Edit_Name(new_name, index - 1);
+			return 0;
+		case(2):
+			float new_salary;
+			printf("Enter a new salary: ");
+			if (!scanf("%f", &new_salary))
+				return 4;
+			Edit_Salary(new_salary, index - 1);
+			return 0;
+
+		default:
+			printf("The command was not found");
+			return 0;
+		}
+		return 0;
+	}
+
+	int Edit_Name(char* name_, int index_)
+	{
+		arr[index_].Set_Name(name_);
+		return 0;
+	}
+
+	int Edit_Salary(float salary_, int index_)
+	{
+		arr[index_].Set_Salary(salary_);
+		return 0;
+	}
+
+	int Copy_Base_into_File(const char* file_name_)
+	{
+		FILE* file;
+		fopen_s(&file, file_name_, "w");
+		if (!file)
+			return 1;
+
+		for (int i = 0; i < size; ++i)
+		{
+			fprintf(file,"%s %d %f %s\n", arr[i].Get_Name(), arr[i].Get_Year(), arr[i].Get_Salary(), arr[i].Get_Date());
+		}
+		return 0;
+	}
+
+	int Expansion_Base()
+	{
+		Base temp(max_size * 2);
+
+		for (int i = 0; i < max_size; ++i)
+		{
+			temp.arr[i] = arr[i];
+		}
+
+		arr = new Employee[max_size * 2];
+
+		for (int i = 0; i < temp.max_size; ++i)
+		{
+			arr[i] = temp.arr[i];
+		}
+		max_size = temp.max_size;
+
+		return 0;
 	}
 };
 
-int Create_F(const char* file_name_, int& size, Employee* arr) 
+
+
+int Create_F(const char* file_name_, int& size, Employee* arr)
 {
 	FILE* file;
 	fopen_s(&file, file_name_, "r");
 	if (!file)
-		return -1;
+		return 1;
 
 	char surname[31];
 	char initials[5];
@@ -257,6 +426,8 @@ int Create_F(const char* file_name_, int& size, Employee* arr)
 	while (fscanf(file, "%s %s %d %f %s", surname, initials, &year, &salary, date) != EOF)
 	{
 		strcat(surname, " ");
+		if (initials[4] != '\0')
+			return 3;
 		strcat(surname, initials);
 		arr[size].Set_Name(surname);
 		arr[size].Set_Year(year);
@@ -267,7 +438,7 @@ int Create_F(const char* file_name_, int& size, Employee* arr)
 	}
 
 	if (size > maxn)
-		return -2;
+		return 2;
 
 	return 0;
 }
@@ -299,73 +470,176 @@ float Request_1(Employee* arr_, int size_, int current_year_, int& k, char** FIO
 	return average_salary;
 }
 
+void Menu()
+{
+	printf("1. Print base\n");
+	printf("2. Add new notes\n");
+	printf("3. Add new notes from file\n");
+	printf("4. Delete note from base\n");
+	printf("5. Edit note\n");
+	printf("6. Copy base into file\n");
+	printf("7. Request 1\n");
+}
 
 
 int main()
 {
-	/*
-	int size;
 
-	Employee arr[maxn];
-
-	int error = 0;
-
-	error = Create_F("test.txt", size, arr);
-	switch (error)
-	{
-	case -1:
-		printf("File opening error");
-		exit(-1);
-	case -2:
-		printf("There is too much incoming data");
-		exit(-2);
-	}
-
-	int size_employee = 0;
-
-	char** FIO_25years = new char* [maxn];
-	for (int i = 0; i < maxn; i++)
-		FIO_25years[i] = new char[31];
-
-	printf("Average salary: %0.2f\n", Request_1(arr, size, 2024, size_employee, FIO_25years));
-
-	for (int i = 0; i < size_employee; i++)
-	{
-		printf("%s\n", FIO_25years[i]);
-	}
-	*/
+	printf("Enter the name file: ");
+	char file_name[maxn];
+	if (!scanf("%s", file_name))
+		return 4;
+	printf("\n Done\n\n");
 
 	Base base;
-
-	base.Create_Base_F("test.txt");
-
-	base.Print_Base();
-	printf("----\n");
-
-	base.Add("Maaaa A.E.", 2000, 1111.1, "01.02.3008");
-
-	base.Print_Base();
-	printf("----\n");
+	while (base.Create_Base_F(file_name) == 2) //Создание базы из файла
+	{
+		base.Expansion_Base();
+	}
 
 	Employee emp[maxn];
-	int size;
+	char file_name3[maxn];
 
-	Create_F("test2.txt", size, emp);
+	char file_name6[maxn];
 
-	base.Add_from_class(emp, size);
+	Employee arr[maxn];
+	char** FIO_25years = new char* [maxn];
 
-	base.Print_Base();
-	printf("----\n");
+	while (1)
+	{
+		system("cls");
+		int choice;
+		printf("What do you need?\n");
 
-	//Base base2;
+		Menu();
 
-	//base2.Create_Base_F("test2.txt");
+		if (!scanf("%d", &choice))
+			return 4;
 
-	//base.Add_from_base(base2);
+		system("cls");
 
-	//base.Print_Base();
-	//printf("----\n");
+		switch (choice)
+		{
+		case 1:
+			base.Print_Base();
 
+			system("pause");
+			continue;
+
+		case 2:
+			char name2[31];
+			char initials2[5];
+			int year2;
+			float salary2;
+			char date2[11];
+
+			printf("Enter name, year of birth, salary, and date of employment: ");
+			if (!scanf("%s %s %d %f %s", name2, initials2, &year2, &salary2, date2))
+				return 4;
+
+			strcat(name2, " ");
+			if (initials2[4] != '\0')
+				return 3;
+			strcat(name2, initials2);
+
+			base.Add(name2, year2, salary2, date2);
+
+			printf("\nDone\n\n");
+
+			system("pause");
+			continue;
+		case 3:
+			int size3;
+
+			printf("Enter the name file: ");
+			if (!scanf("%s", file_name3))
+				return 4;
+
+			Create_F(file_name3, size3, emp);
+
+			while (base.Add_from_classes(emp, size3) == 2) { base.Expansion_Base(); }
+
+			printf("\nDone\n\n");
+			system("pause");
+			continue;
+
+		case 4:
+
+			char name[31];
+			char initials[5];
+
+			base.Print_Base();
+
+			printf("Enter the name of whom you want to delete: ");
+			if (!scanf("%s %s", name, initials))
+				return 4;
+
+			strcat(name, " ");
+			if (initials[4] != '\0')
+				return 3;
+			strcat(name, initials);
+
+			base.Delete_Note(name);
+
+			printf("\nDone\n\n");
+			system("pause");
+			continue;
+
+		case 5:
+			int choice_edit;
+			printf("What do you want to change?\n");
+			printf("1. Name\n");
+			printf("2. Salary\n");
+			if (!scanf("%d", &choice_edit))
+				return 4;
+			system("cls");
+
+			base.Edit_Data(choice_edit);
+
+			printf("\nDone\n\n");
+			system("pause");
+			continue;
+
+		case 6:
+			printf("Enter the name file: ");
+			if (!scanf("%s", file_name6))
+				return 4;
+			base.Copy_Base_into_File(file_name6);
+
+			printf("\nDone\n\n");
+			system("pause");
+			continue;
+
+		case 7:
+
+			int number_of_employee;
+
+			for (int i = 0; i < maxn; ++i)
+				FIO_25years[i] = new char[31];
+
+			printf("Average salary: %0.2f\n", Request_1(base.Get_Arr(), base.Get_Size(), 2024, number_of_employee, FIO_25years));
+
+			for (int i = 0; i < number_of_employee; ++i)
+			{
+				printf("%s\n", FIO_25years[i]);
+			}
+			
+			printf("\nDone\n\n");
+			system("pause");
+			continue;
+
+		default:
+			int choise_def;
+			printf("Do you want to exit?\n");
+			printf("1. No\n");
+			printf("Any one. Yes\n");
+			if(!scanf("%d", &choise_def))
+				return 4;
+			if (choise_def != 0)
+				return 0;
+			continue;
+		}
+	}
 
 
 	return 0;
