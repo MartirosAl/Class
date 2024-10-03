@@ -394,14 +394,16 @@ public:
 		{
 			temp.arr[i] = arr[i];
 		}
-                max_size = max_size*2;
-		arr = new Employee[max_size];
+                temp.max_size = max_size*2;
+		delete[] art;
+		arr = new Employee[temp.max_size];
 
-		for (int i = 0; i < max_size; ++i)
+		for (int i = 0; i < temp.max_size; ++i)
 		{
 			arr[i] = temp.arr[i];
 		}
-		delete [] temp;
+		max_size = temp.max_size;
+		delete[] temp;
 
 		return 0;
 	}
