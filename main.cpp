@@ -388,7 +388,7 @@ public:
 
 	int Expansion_Base()
 	{
-		Base temp(max_size * 2);
+		Base temp(max_size);
 
 		for (int i = 0; i < max_size; ++i)
 		{
@@ -401,7 +401,7 @@ public:
 		{
 			arr[i] = temp.arr[i];
 		}
-		max_size = temp.max_size;
+		max_size = max_size * 2;
 
 		return 0;
 	}
@@ -492,7 +492,7 @@ int main()
 	printf("\n Done\n\n");
 
 	Base base;
-	while (base.Create_Base_F(file_name) == 2) //Ñîçäàíèå áàçû èç ôàéëà
+	while (base.Create_Base_F(file_name) == 2) //Ã‘Ã®Ã§Ã¤Ã Ã­Ã¨Ã¥ Ã¡Ã Ã§Ã» Ã¨Ã§ Ã´Ã Ã©Ã«Ã 
 	{
 		base.Expansion_Base();
 	}
