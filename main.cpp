@@ -402,6 +402,7 @@ public:
 			arr[i] = temp.arr[i];
 		}
 		max_size = max_size * 2;
+		delete [] temp;
 
 		return 0;
 	}
