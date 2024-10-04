@@ -42,6 +42,7 @@ public:
 
 	Employee(const Employee& employee_)
 	{
+		
 		name = new char[strlen(employee_.name)+1];
 		strcpy(name, employee_.name);
 		year = employee_.year;
@@ -141,7 +142,7 @@ public:
 	
 	Base()
 	{
-		max_size = 100;
+		max_size = maxn;
 		arr = new Employee[max_size];
 		size = 0;
 		//printf("Default constructor base working\n");
@@ -234,19 +235,20 @@ public:
 			arr[size].Set_Date(date);
 
 			size++;
-			if (size > max_size-1)
-				return 2;
+			if (size == max_size)
+				Expansion_Base();
 		}
+		fclose(file);
 		return 0;
 	}
 
 	int Print_Base()
 	{
-		printf("\tNAME\t\t\t| YEAR\t|   SALARY\t|     DATE\t|  \n");
+		printf("\t\tNAME\t\t| YEAR\t|   SALARY\t|     DATE\t|  \n");
 		printf("--------------------------------|-------|---------------|---------------|\n");
 		for (int i = 0; i < size; ++i)
 		{
-			printf("  %d. ", i+1);
+			printf("  %d.\t", i+1);
 			arr[i].Print_Info();
 			printf("\n");
 		}
@@ -256,45 +258,103 @@ public:
 
 	int Add_from_class(Employee employee_)
 	{
-		arr[size].Set_Name(employee_.Get_Name());
-		arr[size].Set_Date(employee_.Get_Date());
-		arr[size].Set_Salary(employee_.Get_Salary());
-		arr[size].Set_Year(employee_.Get_Year());
+		int i = size - 1;
+		for (; (i >= 0) && (strcmp(arr[i].Get_Name(), employee_.Get_Name()) > 0); --i)
+		{
+			arr[i + 1] = arr[i];
+		}
+		++i;
+
+		arr[i].Set_Name(employee_.Get_Name());
+		arr[i].Set_Date(employee_.Get_Date());
+		arr[i].Set_Salary(employee_.Get_Salary());
+		arr[i].Set_Year(employee_.Get_Year());
 		size++;
 
-		if (size > max_size - 1)
+		if (size == max_size)
 			return 2;
 
 		return 0;
 	}
 
-	int Add_from_classes(Employee* employee_, int& size_)
+	int Add_from_file(char* filename_)
 	{
-		for (int i = 0; i < size_; ++i)
+
+		Base temp;
+		temp.Create_Base_F(filename_);
+
+
+		for (int i = 0; i < temp.Get_Size(); ++i)
 		{
-			arr[size].Set_Name(employee_[i].Get_Name());
-			arr[size].Set_Date(employee_[i].Get_Date());
-			arr[size].Set_Salary(employee_[i].Get_Salary());
-			arr[size].Set_Year(employee_[i].Get_Year());
+			int j = size - 1;
+			for (; (j >= 0) && (strcmp(arr[j].Get_Name(), temp.arr[i].Get_Name()) > 0); --j)
+			{
+				arr[j + 1] = arr[j];
+			}
+			++j;
+
+			arr[j].Set_Name(temp.arr[i].Get_Name());
+			arr[j].Set_Date(temp.arr[i].Get_Date());
+			arr[j].Set_Salary(temp.arr[i].Get_Salary());
+			arr[j].Set_Year(temp.arr[i].Get_Year());
 			size++;
 
-			if (size > max_size - 1)
-				return 2;
+			if (size == max_size)
+				Expansion_Base();
 		}
+
+
+		if (size == max_size)
+			return 2;
+
 
 		return 0;
 	}
 
+	/*int Add_from_classes(Employee* employee_, int& size_)
+	{
+
+		for (int i = 0; i < size_; ++i)
+		{
+			int j = size - 1;
+			for (; (j >= 0) && (strcmp(arr[j].Get_Name(), employee_[i].Get_Name()) > 0); --j)
+			{
+				arr[j + 1] = arr[j];
+			}
+			++j;
+
+			arr[j].Set_Name(employee_[i].Get_Name());
+			arr[j].Set_Date(employee_[i].Get_Date());
+			arr[j].Set_Salary(employee_[i].Get_Salary());
+			arr[j].Set_Year(employee_[i].Get_Year());
+			size++;
+
+			if (size == max_size)
+				Expansion_Base();
+		}
+		if (size == max_size)
+			return 2;
+
+		return 0;
+	}*/
+
 	int Add(const char* name_, int year_, float salary_, const char* date_)
 	{
-		arr[size].Set_Name(name_);
-		arr[size].Set_Date(date_);
-		arr[size].Set_Salary(salary_);
-		arr[size].Set_Year(year_);
+		int i = size - 1;
+		for (; (i >= 0) && (strcmp(arr[i].Get_Name(), name_) > 0); --i)
+		{
+			arr[i + 1] = arr[i];
+		}
+		++i;
+
+		arr[i].Set_Name(name_);
+		arr[i].Set_Date(date_);
+		arr[i].Set_Salary(salary_);
+		arr[i].Set_Year(year_);
 		
 		size++;
 
-		if (size > max_size - 1)
+		if (size == max_size)
 			return 2;
 
 		return 0;
@@ -362,7 +422,14 @@ public:
 
 	int Edit_Name(char* name_, int index_)
 	{
-		arr[index_].Set_Name(name_);
+		int i = size - 1;
+		for (; (strcmp(arr[i].Get_Name(), name_) > 0) && (i >= 0); --i)
+		{
+			arr[i + 1] = arr[i];
+		}
+		++i;
+
+		arr[i].Set_Name(name_);
 		return 0;
 	}
 
@@ -383,6 +450,8 @@ public:
 		{
 			fprintf(file,"%s %d %f %s\n", arr[i].Get_Name(), arr[i].Get_Year(), arr[i].Get_Salary(), arr[i].Get_Date());
 		}
+
+		fclose(file);
 		return 0;
 	}
 
@@ -394,17 +463,94 @@ public:
 		{
 			temp.arr[i] = arr[i];
 		}
-                max_size = max_size*2;
+		max_size = max_size * 2;
 		delete[] arr;
 		arr = new Employee[max_size];
 
-		for (int i = 0; i < max_size; ++i)
+		for (int i = 0; i < temp.max_size; ++i)
 		{
 			arr[i] = temp.arr[i];
 		}
-		delete[] temp;
-
 		return 0;
+	}
+
+	void Merge(int left, int mid, int right)
+	{
+		int n1 = mid - left + 1;
+		int n2 = right - mid;
+
+
+		Employee* L = new Employee[right];
+		Employee* R = new Employee[right];
+
+		for (int i = 0; i < n1; i++)
+		{
+			L[i].Set_Name(arr[left + i].Get_Name());
+			L[i].Set_Year(arr[left + i].Get_Year());
+			L[i].Set_Salary(arr[left + i].Get_Salary());
+			L[i].Set_Date(arr[left + i].Get_Date());
+		}
+		for (int j = 0; j < n2; j++)
+		{
+			R[j].Set_Name(arr[mid + 1 + j].Get_Name());
+			R[j].Set_Year(arr[mid + 1 + j].Get_Year());
+			R[j].Set_Salary(arr[mid + 1 + j].Get_Salary());
+			R[j].Set_Date(arr[mid + 1 + j].Get_Date());
+		}
+
+		int i = 0, j = 0;
+		int k = left;
+
+		while (i < n1 && j < n2) {
+			if (strcmp(L[i].Get_Name(), R[j].Get_Name()) < 0) {
+				arr[k].Set_Name(L[i].Get_Name());
+				arr[k].Set_Year(L[i].Get_Year());
+				arr[k].Set_Salary(L[i].Get_Salary());
+				arr[k].Set_Date(L[i].Get_Date());
+				i++;
+			}
+			else {
+				arr[k].Set_Name(R[j].Get_Name());
+				arr[k].Set_Year(R[j].Get_Year());
+				arr[k].Set_Salary(R[j].Get_Salary());
+				arr[k].Set_Date(R[j].Get_Date());
+				j++;
+			}
+			k++;
+		}
+
+
+		while (i < n1) {
+			arr[k].Set_Name(L[i].Get_Name());
+			arr[k].Set_Year(L[i].Get_Year());
+			arr[k].Set_Salary(L[i].Get_Salary());
+			arr[k].Set_Date(L[i].Get_Date());
+			i++;
+			k++;
+		}
+
+
+		while (j < n2) {
+			arr[k].Set_Name(R[j].Get_Name());
+			arr[k].Set_Year(R[j].Get_Year());
+			arr[k].Set_Salary(R[j].Get_Salary());
+			arr[k].Set_Date(R[j].Get_Date());
+			j++;
+			k++;
+		}
+		delete[] L;
+		delete[] R;
+	}
+
+	void MergeSort(int left, int right)
+	{
+		if (left >= right)
+			return;
+
+		int mid = left + (right - left) / 2;
+		MergeSort(left, mid);
+		MergeSort(mid + 1, right);
+		Merge(left, mid, right);
 	}
 };
 
@@ -436,10 +582,10 @@ int Create_F(const char* file_name_, int& size, Employee* arr)
 		arr[size].Set_Date(date);
 
 		size++;
+		if (size > maxn)
+			return 2;
 	}
-
-	if (size > maxn)
-		return 2;
+	
 
 	return 0;
 }
@@ -474,12 +620,13 @@ float Request_1(Employee* arr_, int size_, int current_year_, int& k, char** FIO
 void Menu()
 {
 	printf("1. Print base\n");
-	printf("2. Add new notes\n");
+	printf("2. Add new note\n");
 	printf("3. Add new notes from file\n");
 	printf("4. Delete note from base\n");
 	printf("5. Edit note\n");
 	printf("6. Copy base into file\n");
 	printf("7. Request 1\n");
+	printf("8. Sort base\n");
 }
 
 
@@ -490,20 +637,19 @@ int main()
 	char file_name[maxn];
 	if (!scanf("%s", file_name))
 		return 4;
-	printf("\n Done\n\n");
+	
 
 	Base base;
-	while (base.Create_Base_F(file_name) == 2) //Ñîçäàíèå áàçû èç ôàéëà
-	{
+	if (base.Create_Base_F(file_name) == 2)
 		base.Expansion_Base();
-	}
+	printf("\n Done\n\n");
 
 	Employee emp[maxn];
 	char file_name3[maxn];
 
 	char file_name6[maxn];
 
-	Employee arr[maxn];
+	Employee arr3[maxn];
 	char** FIO_25years = new char* [maxn];
 
 	while (1)
@@ -550,15 +696,12 @@ int main()
 			system("pause");
 			continue;
 		case 3:
-			int size3;
 
 			printf("Enter the name file: ");
 			if (!scanf("%s", file_name3))
 				return 4;
 
-			Create_F(file_name3, size3, emp);
-
-			while (base.Add_from_classes(emp, size3) == 2) { base.Expansion_Base(); }
+			while (base.Add_from_file(file_name3) == 2) { base.Expansion_Base(); }
 
 			printf("\nDone\n\n");
 			system("pause");
@@ -629,6 +772,12 @@ int main()
 			system("pause");
 			continue;
 
+		case 8:
+			base.MergeSort(0, base.Get_Size() - 1);
+			printf("\nDone\n\n");
+			system("pause");
+			continue;
+
 		default:
 			int choise_def;
 			printf("Do you want to exit?\n");
@@ -636,7 +785,7 @@ int main()
 			printf("Any one. Yes\n");
 			if(!scanf("%d", &choise_def))
 				return 4;
-			if (choise_def != 0)
+			if (choise_def != 1)
 				return 0;
 			continue;
 		}
