@@ -176,6 +176,11 @@ public:
 		
 	}
 
+	Employee operator[](int i)
+	{
+		return arr[i];
+	}
+
 	Employee Get_Employee(int i_)
 	{
 		return arr[i_];
@@ -680,7 +685,7 @@ int main()
 			float salary2;
 			char date2[11];
 
-			printf("Enter name, year of birth, salary, and date of employment: ");
+			printf("Enter name, year of birth, salary, and date of employment: \n> ");
 			if (!scanf("%s %s %d %f %s", name2, initials2, &year2, &salary2, date2))
 				return 4;
 
@@ -697,7 +702,7 @@ int main()
 			continue;
 		case 3:
 
-			printf("Enter the name file: ");
+			printf("Enter the name file: \n>");
 			if (!scanf("%s", file_name3))
 				return 4;
 
@@ -714,7 +719,7 @@ int main()
 
 			base.Print_Base();
 
-			printf("Enter the name of whom you want to delete: ");
+			printf("Enter the name of whom you want to delete: \n>");
 			if (!scanf("%s %s", name, initials))
 				return 4;
 
@@ -733,7 +738,7 @@ int main()
 			int choice_edit;
 			printf("What do you want to change?\n");
 			printf("1. Name\n");
-			printf("2. Salary\n");
+			printf("2. Salary\n> ");
 			if (!scanf("%d", &choice_edit))
 				return 4;
 			system("cls");
@@ -745,7 +750,7 @@ int main()
 			continue;
 
 		case 6:
-			printf("Enter the name file: ");
+			printf("Enter the name file: \n> ");
 			if (!scanf("%s", file_name6))
 				return 4;
 			base.Copy_Base_into_File(file_name6);
@@ -780,7 +785,7 @@ int main()
 
 		default:
 			int choise_def;
-			printf("Do you want to exit?\n");
+			printf("Do you want to exit?\n> ");
 			printf("1. No\n");
 			printf("Any one. Yes\n");
 			if(!scanf("%d", &choise_def))
