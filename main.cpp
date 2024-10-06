@@ -391,10 +391,15 @@ public:
 	int Edit_Data(const int choice_)
 	{
 		Print_Base();
-		printf("Select the number to change: ");
-		int index;
-		if (!scanf("%d", &index))
+		printf("Select a name to change: ");
+		char temp_name[31];
+		char temp_initials[5];
+		if (!scanf("%s %s", temp_name, temp_initials))
 			return 4;
+		if (temp_initials[4] != '\0')
+			return 3;
+		strcat(temp_name, " ");
+		strcat(temp_name, temp_initials);
 		printf("\n");
 		switch (choice_)
 		{
@@ -408,14 +413,14 @@ public:
 				return 3;
 			strcat(new_name, " ");
 			strcat(new_name, new_initials);
-			Edit_Name(new_name, index - 1);
+			Edit_Name(new_name, temp_name);
 			return 0;
 		case(2):
 			float new_salary;
 			printf("Enter a new salary: ");
 			if (!scanf("%f", &new_salary))
 				return 4;
-			Edit_Salary(new_salary, index - 1);
+			Edit_Salary(new_salary, temp_name);
 			return 0;
 
 		default:
@@ -425,22 +430,19 @@ public:
 		return 0;
 	}
 
-	int Edit_Name(char* name_, int index_)
+	int Edit_Name(char* name_, char* old_name_)
 	{
-		int i = size - 1;
-		for (; (strcmp(arr[i].Get_Name(), name_) > 0) && (i >= 0); --i)
-		{
-			arr[i + 1] = arr[i];
-		}
-		++i;
+		int index = Find_Data_on_Name(old_name_);
 
-		arr[i].Set_Name(name_);
+		Delete_Note(old_name_);
+		Add(name_, arr[index].Get_Year(), arr[index].Get_Salary(), arr[index].Get_Date());
+
 		return 0;
 	}
 
-	int Edit_Salary(float salary_, int index_)
+	int Edit_Salary(float salary_, char* name_)
 	{
-		arr[index_].Set_Salary(salary_);
+		arr[Find_Data_on_Name(name_)].Set_Salary(salary_);
 		return 0;
 	}
 
@@ -638,7 +640,7 @@ void Menu()
 int main()
 {
 
-	printf("Enter the name file: ");
+	printf("Enter the name file: \n>> ");
 	char file_name[maxn];
 	if (!scanf("%s", file_name))
 		return 4;
@@ -664,7 +666,7 @@ int main()
 		printf("What do you need?\n");
 
 		Menu();
-
+		printf("> ");
 		if (!scanf("%d", &choice))
 			return 4;
 
@@ -795,7 +797,6 @@ int main()
 			continue;
 		}
 	}
-
 
 	return 0;
 }
