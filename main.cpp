@@ -105,7 +105,7 @@ public:
 
 	void Print_Info() 
 	{
-		printf("%-20s  \t| %d\t| %0.2f\t| %s\t|", name, year, salary, date);
+		printf("%-30s  \t| %d\t| %0.2f\t| %s\t|", name, year, salary, date);
 	}
 
 	int Input_Info() 
@@ -249,15 +249,15 @@ public:
 
 	int Print_Base()
 	{
-		printf("\t\tNAME\t\t| YEAR\t|   SALARY\t|     DATE\t|  \n");
-		printf("--------------------------------|-------|---------------|---------------|\n");
+		printf("            NAME                                | YEAR  |   SALARY      |     DATE      |\n");
+		printf("------------------------------------------------|-------|---------------|---------------|\n");
 		for (int i = 0; i < size; ++i)
 		{
 			printf("  %d.\t", i+1);
 			arr[i].Print_Info();
 			printf("\n");
 		}
-		printf("--------------------------------^-------^---------------^---------------/\n");
+		printf("------------------------------------------------^-------^---------------^---------------/\n");
 		return 0;
 	}
 
