@@ -413,7 +413,8 @@ public:
 				return 3;
 			strcat(new_name, " ");
 			strcat(new_name, new_initials);
-			Edit_Name(new_name, temp_name);
+			if (Edit_Name(new_name, temp_name) == -1)
+				return -1;
 			return 0;
 		case(2):
 			float new_salary;
@@ -433,6 +434,8 @@ public:
 	int Edit_Name(char* name_, char* old_name_)
 	{
 		int index = Find_Data_on_Name(old_name_);
+		if (index == -1)
+			return -1;
 		int old_year = arr[index].Get_Year();
 		float old_salary = arr[index].Get_Salary();
 		char old_date[11];
@@ -644,7 +647,7 @@ void Menu()
 int main()
 {
 
-	printf("Enter the name file: \n>> ");
+	printf("Enter the name file: \n>>");
 	char file_name[maxn];
 	if (!scanf("%s", file_name))
 		return 4;
