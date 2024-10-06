@@ -433,9 +433,13 @@ public:
 	int Edit_Name(char* name_, char* old_name_)
 	{
 		int index = Find_Data_on_Name(old_name_);
+		int old_year = arr[index].Get_Year();
+		float old_salary = arr[index].Get_Salary();
+		char old_date[11];
+		strcpy(old_date, arr[index].Get_Date());
 
 		Delete_Note(old_name_);
-		Add(name_, arr[index].Get_Year(), arr[index].Get_Salary(), arr[index].Get_Date());
+		Add(name_, old_year, old_salary, old_date);
 
 		return 0;
 	}
