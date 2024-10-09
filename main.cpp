@@ -105,7 +105,7 @@ public:
 
 	void Print_Info() 
 	{
-		printf("%-30s  \t| %d\t| %0.2f\t| %s\t|", name, year, salary, date);
+		printf("%-30s  \t| %d\t| %-14.2f| %s\t|", name, year, salary, date);
 	}
 
 	int Input_Info() 
