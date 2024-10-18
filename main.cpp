@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
+#include <locale.h>
+#include <Windows.h>
 using namespace std;
 
 
@@ -646,7 +648,9 @@ void Menu()
 
 int main()
 {
-
+	//setlocale(LC_ALL, "RUS");  //setlocale(LC_ALL, ".1251"); // Не работает
+	SetConsoleCP(1251); //из Windows.h для ввода
+	SetConsoleOutputCP(1251); //для вывода
 	printf("Enter the name file: \n>>");
 	char file_name[maxn];
 	if (!scanf("%s", file_name))
@@ -689,7 +693,7 @@ int main()
 
 		case 2:
 			char name2[31];
-			char initials2[5];
+			char initials2[10];
 			int year2;
 			float salary2;
 			char date2[11];
