@@ -127,7 +127,7 @@ public:
 
 	bool Sif(const char* str_)
 	{
-		return (strcmp(name, str_) == 0) ? true : false;
+		return !strcmp(name, str_);
 	}
 
 
@@ -153,7 +153,7 @@ public:
 	Base(int size_)
 	{
 		int i = 1;
-		for (; 100 * i < size_; ++i);
+		for (i = 1; 100 * i < size_; ++i);
 		max_size = 100 * i;
 		arr = new Employee[max_size];
 		size = 0;
@@ -178,9 +178,12 @@ public:
 		
 	}
 
-	Employee operator[](int i)
+	Employee& operator[](int i)
 	{
-		return arr[i];
+		if (i >= 0 && i < size)
+			return arr[i];
+
+		throw 1;
 	}
 
 	Employee Get_Employee(int i_)
@@ -263,23 +266,19 @@ public:
 		return 0;
 	}
 
-	int Add_from_class(Employee employee_)
+	int Add_from_class(Employee& employee_)
 	{
-		int i = size - 1;
-		for (; (i >= 0) && (strcmp(arr[i].Get_Name(), employee_.Get_Name()) > 0); --i)
+		int i;
+		for (i = size - 1; (i >= 0) && (strcmp(arr[i].Get_Name(), employee_.Get_Name()) > 0); --i)
 		{
 			arr[i + 1] = arr[i];
 		}
 		++i;
 
-		arr[i].Set_Name(employee_.Get_Name());
-		arr[i].Set_Date(employee_.Get_Date());
-		arr[i].Set_Salary(employee_.Get_Salary());
-		arr[i].Set_Year(employee_.Get_Year());
-		size++;
+		arr[size++] = employee_;
 
 		if (size == max_size)
-			return 2;
+			Expansion_Base();
 
 		return 0;
 	}
@@ -312,7 +311,7 @@ public:
 
 
 		if (size == max_size)
-			return 2;
+			Expansion_Base();
 
 
 		return 0;
@@ -362,7 +361,7 @@ public:
 		size++;
 
 		if (size == max_size)
-			return 2;
+			Expansion_Base();
 
 		return 0;
 	}
@@ -477,7 +476,7 @@ public:
 
 		for (int i = 0; i < max_size; ++i)
 		{
-			temp.arr[i] = arr[i];
+			temp[i] = arr[i];
 		}
 		max_size = max_size * 2;
 		delete[] arr;
@@ -485,7 +484,7 @@ public:
 
 		for (int i = 0; i < temp.max_size; ++i)
 		{
-			arr[i] = temp.arr[i];
+			arr[i] = temp[i];
 		}
 		return 0;
 	}
